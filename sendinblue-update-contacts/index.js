@@ -2,6 +2,7 @@ import axios from 'axios';
 
 async function getContacts() {
     try {
+        console.info('Getting contacts from database');
         return Promise.resolve([
             {
                 email: 'contact@fabienrenaud.fr',
@@ -17,19 +18,22 @@ async function getContacts() {
 
 async function updateContacts(contacts) {
     try {
+        console.info('Updating contacts in sendinblue');
         await axios.post('https://api.sendinblue.com/v3/contacts', contacts);
     } catch (error) {
-        throw new Error('An error occurred while registering contacts', error);
+        throw new Error('An error occurred while updating contacts in sendinblue', error);
     }
 }
 
-exports.sendinblueUpdateContacts = async (request, response) => {
+async function sendinblueUpdateContacts(request, response) {
     try {
         const contacts = await getContacts();
-        await updateContacts(contacts);
+        // await updateContacts(contacts);
         response.send(201);
     } catch (error) {
         console.error(error);
         response.status(500).send(error);
     }
-};
+}
+
+export {sendinblueUpdateContacts};

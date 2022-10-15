@@ -1,0 +1,14 @@
+{
+    "name": "sendinblue-update-contacts",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Update contact lists in SendInBlue",
+    "main": "index.js",
+    "scripts": {},
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^1.1.3"
+    }
+}

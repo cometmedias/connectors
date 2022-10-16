@@ -1,25 +1,6 @@
-resource "random_string" "main" {
-  length  = 5
-  special = false
-}
-
-data "archive_file" "main" {
-  type        = "zip"
-  source_dir  = var.source_dir
-  output_path = "${var.output_path}.zip"
-  excludes    = var.excludes
-}
-
-resource "google_storage_bucket" "main" {
-  name                        = "${var.project}-${var.name}"
-  location                    = var.location
-  uniform_bucket_level_access = true
-}
-
-resource "google_storage_bucket_object" "main" {
-  name   = "${var.name}.zip"
-  bucket = google_storage_bucket.main.name
-  source = data.archive_file.main.output_path
+resource "google_service_account" "main" {
+  account_id   = "sa-${var.name}"
+  display_name = "Service Account for ${var.name}"
 }
 
 resource "google_cloudfunctions2_function" "main" {
@@ -41,19 +22,24 @@ resource "google_cloudfunctions2_function" "main" {
   }
 
   service_config {
-    max_instance_count = 1
-    available_memory   = "256M"
-    timeout_seconds    = 60
+    max_instance_count    = 1
+    available_memory      = "256M"
+    timeout_seconds       = 60
+    service_account_email = google_service_account.main.email
+
+    environment_variables = var.environment_variables
+
+    dynamic "secret_environment_variables" {
+      for_each = var.secret_environment_variables
+
+      content {
+        key        = secret_environment_variables.key
+        project_id = var.project
+        secret     = google_secret_manager_secret.main[secret_environment_variables.key].secret_id
+        version    = "latest"
+      }
+    }
   }
-}
 
-resource "google_cloud_run_service_iam_member" "main" {
-  count = var.allow_unauthenticated ? 1 : 0
-
-  project  = google_cloudfunctions2_function.main.project
-  location = google_cloudfunctions2_function.main.location
-  service  = google_cloudfunctions2_function.main.name
-
-  role   = "roles/run.invoker"
-  member = "allUsers"
+  depends_on = [google_secret_manager_secret_iam_member.main]
 }

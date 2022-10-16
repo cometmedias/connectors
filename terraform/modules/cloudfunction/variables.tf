@@ -45,6 +45,18 @@ variable "excludes" {
   type        = list(string)
 }
 
+variable "environment_variables" {
+  description = "(Optional) Environment variables that shall be available during function execution."
+  type        = map(string)
+  default     = {}
+}
+
+variable "secret_environment_variables" {
+  description = "(Optional) Secret environment variables that shall be available during function execution."
+  type        = map(string)
+  default     = {}
+}
+
 variable "allow_unauthenticated" {
   description = "(Optional) Should allow unauthenticated access"
   type        = bool

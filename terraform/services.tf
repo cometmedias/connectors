@@ -1,5 +1,5 @@
 resource "google_project_service" "project_services" {
-  for_each = toset(["artifactregistry.googleapis.com"])
+  for_each = toset(["artifactregistry.googleapis.com", "secretmanager.googleapis.com"])
 
   project = var.project
   service = each.key

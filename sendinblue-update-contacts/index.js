@@ -1,39 +1,28 @@
 import axios from 'axios';
+import postgres from 'pg';
+import {freeSubscriptionStatus, premiumSubscriptionStatus, terminatedSubscriptionStatus} from './constants.js';
+import {pipeAsync} from './utils/index.js';
 
-const {FREE_SUBSCRIPTION_LIST_ID, PREMIUM_SUBSCRIPTION_LIST_ID, SENDINBLUE_API_KEY} = process.env;
+const {FREE_SUBSCRIPTION_LIST_ID, PREMIUM_SUBSCRIPTION_LIST_ID} = process.env;
 
-const headers = {headers: {'api-key': SENDINBLUE_API_KEY}};
-
-async function getFreeSubscriptionContacts() {
-    try {
-        console.info('Getting free subscription contacts from database');
-        const contacts = await Promise.resolve([{email: 'free@fabienrenaud.fr', attributes: {NOM: 'RENAUD', PRENOM: 'Fabien', SMS: ''}}]);
-        return contacts.map((contact) => ({...contact, listIds: [FREE_SUBSCRIPTION_LIST_ID], updateEnabled: true}));
-    } catch (error) {
-        throw new Error('An error occurred while getting free subscription contacts from database', error);
-    }
+function createQueryBySubscriptionStatus(subscriptionStatus) {
+    return `
+        SELECT c.EMAIL, c.CIVILITE, c.NOM, c.PRENOM, ta.NOM_ABONNEMENT
+        FROM abonnements a
+        JOIN contacts c ON a.ID_SOCIETE = c.ID_ENTREPRISE
+        JOIN type_abonnement ta ON a.STATUT_DESTINATAIRE = ta.ID_TYPE_ABONNEMENT
+        WHERE ta.NOM_ABONNEMENT IN (${subscriptionStatus.map((name) => `"${name}"`).join(', ')})
+        GROUP BY c.email
+        ORDER BY DATE (a.DATE_MAJ) DESC LIMIT 1;
+    `;
 }
 
-async function getPremiumSubscriptionContacts() {
-    try {
-        console.info('Getting premium subscription contacts from database');
-        const contacts = await Promise.resolve([
-            {email: 'premium@fabienrenaud.fr', attributes: {NOM: 'RENAUD', PRENOM: 'Fabien', SMS: ''}},
-            {email: 'terminated@fabienrenaud.fr', attributes: {NOM: 'RENAUD', PRENOM: 'Fabien', SMS: ''}}
-        ]);
-        return contacts.map((contact) => ({...contact, listIds: [PREMIUM_SUBSCRIPTION_LIST_ID], updateEnabled: true}));
-    } catch (error) {
-        throw new Error('An error occurred while getting premium subscription contacts from database', error);
-    }
+function getRowResults(results) {
+    return results.map((result) => result.rows);
 }
 
-async function getTerminatedSubscriptionContacts() {
-    try {
-        console.info('Getting terminated subscription contacts from database');
-        return Promise.resolve([{email: 'terminated@fabienrenaud.fr', attributes: {NOM: 'RENAUD', PRENOM: 'Fabien', SMS: ''}}]);
-    } catch (error) {
-        throw new Error('An error occurred while getting terminated subscription contacts from database', error);
-    }
+function setListId(listId) {
+    return (contacts) => contacts.map((contact) => ({...contact, listIds: [listId], updateEnabled: true}));
 }
 
 async function updateContacts(contacts) {
@@ -56,19 +45,24 @@ async function deleteContacts(contacts) {
     }
 }
 
-async function sendinblueUpdateContacts(request, response) {
+export async function sendinblueUpdateContacts(request, response) {
     try {
-        const freeSubscriptionContacts = await getFreeSubscriptionContacts();
-        const premiumSubscriptionContacts = await getPremiumSubscriptionContacts();
-        const terminatedSubscriptionContacts = await getTerminatedSubscriptionContacts();
+        // Using Pool instead of regular Client because of cloudfunction special environment
+        const client = new postgres.Pool({
+            host: process.env.DATABASE_HOST,
+            port: process.env.DATABASE_PORT,
+            user: process.env.DATABASE_USER,
+            password: process.env.DATABASE_PASSWORD,
+            database: process.env.DATABASE_DATABASE
+        });
 
-        await updateContacts([...freeSubscriptionContacts, ...premiumSubscriptionContacts]);
-        await deleteContacts(terminatedSubscriptionContacts);
+        await pipeAsync(createQueryBySubscriptionStatus, client.query, getRowResults, setListId(FREE_SUBSCRIPTION_LIST_ID), updateContacts)(freeSubscriptionStatus);
+        await pipeAsync(createQueryBySubscriptionStatus, client.query, getRowResults, setListId(PREMIUM_SUBSCRIPTION_LIST_ID), updateContacts)(premiumSubscriptionStatus);
+        await pipeAsync(createQueryBySubscriptionStatus, client.query, getRowResults, deleteContacts)(terminatedSubscriptionStatus);
+
         response.send(201);
     } catch (error) {
         console.error(error);
         response.status(500).send(error);
     }
 }
-
-export {sendinblueUpdateContacts};

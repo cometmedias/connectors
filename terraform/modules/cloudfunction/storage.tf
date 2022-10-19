@@ -12,7 +12,7 @@ resource "google_storage_bucket" "main" {
 }
 
 resource "google_storage_bucket_object" "main" {
-  name   = "${var.name}.zip"
+  name   = "${var.name}-${data.archive_file.main.output_md5}.zip"
   bucket = google_storage_bucket.main.name
   source = data.archive_file.main.output_path
 }

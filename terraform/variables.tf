@@ -17,3 +17,28 @@ variable "sendinblue_api_key" {
   description = "(Required) The sendinblue api key"
   type        = string
 }
+
+variable "database_host" {
+  description = "(Required) The intranet database host"
+  type        = string
+}
+
+variable "database_port" {
+  description = "(Required) The intranet database port"
+  type        = string
+}
+
+variable "database_user" {
+  description = "(Required) The intranet database user"
+  type        = string
+}
+
+variable "database_database" {
+  description = "(Required) The intranet database database"
+  type        = string
+}
+
+variable "database_password" {
+  description = "(Required) The intranet database password"
+  type        = string
+}

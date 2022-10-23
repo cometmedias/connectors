@@ -1,6 +1,31 @@
-export const headers = {headers: {'api-key': process.env.SENDINBLUE_API_KEY}};
+const {
+    // Parameters
+    ATTRIBUTES_ABONNEMENTS,
+    ATTRIBUTES_TYPE_ABONNEMENT,
+    ATTRIBUTES_CONTACTS,
+    SYNCHRONISATION_PERIOD,
+    // Database configuration
+    DATABASE_HOST,
+    DATABASE_PORT,
+    DATABASE_USER,
+    DATABASE_PASSWORD,
+    DATABASE_DATABASE
+} = process.env;
 
-export const SUBSCRIPTION_STATUS = {
+export const attributesAbonnements = ATTRIBUTES_ABONNEMENTS ? ATTRIBUTES_ABONNEMENTS.split(',') : [];
+export const attributesTypeAbonnement = ATTRIBUTES_TYPE_ABONNEMENT ? ATTRIBUTES_TYPE_ABONNEMENT.split(',') : [];
+export const attributesContacts = ATTRIBUTES_CONTACTS ? ATTRIBUTES_CONTACTS.split(',') : [];
+export const synchronizationPeriod = parseInt(SYNCHRONISATION_PERIOD);
+
+export const databaseConfig = {
+    host: DATABASE_HOST,
+    port: DATABASE_PORT,
+    user: DATABASE_USER,
+    password: DATABASE_PASSWORD,
+    database: DATABASE_DATABASE
+};
+
+const SUBSCRIPTION_STATUS = {
     ABO_ACCESS: 'ABO ACCESS',
     ABO_PREMIUM: 'ABO PREMIUM',
     ABO_OFFERT: 'ABO OFFERT',

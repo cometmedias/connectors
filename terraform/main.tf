@@ -2,7 +2,7 @@ provider "google" {
   project = var.project
 }
 
-module "sendinblue-update-contacts" {
+module "sendinblue_update_contacts" {
   source      = "./modules/cloudfunction"
   name        = "sendinblue-update-contacts"
   project     = var.project
@@ -15,17 +15,26 @@ module "sendinblue-update-contacts" {
   excludes    = ["node_modules"]
 
   environment_variables = {
-    FREE_SUBSCRIPTION_LIST_ID    = var.free_subscription_list_id
-    PREMIUM_SUBSCRIPTION_LIST_ID = var.premium_subscription_list_id
-    DATABASE_HOST                = var.database_host
-    DATABASE_PORT                = var.database_port
-    DATABASE_USER                = var.database_user
-    DATABASE_PASSWORD            = var.database_database
+    # Parameters
+    ATTRIBUTES_ABONNEMENTS     = var.attributes_abonnements
+    ATTRIBUTES_TYPE_ABONNEMENT = var.attributes_type_abonnement
+    ATTRIBUTES_CONTACTS        = var.attributes_contacts
+    SYNCHRONISATION_PERIOD     = var.synchronisation_period
+
+    # Intranet
+    DATABASE_HOST     = var.database_host
+    DATABASE_PORT     = var.database_port
+    DATABASE_USER     = var.database_user
+    DATABASE_DATABASE = var.database_database
+
+    # Sendinblue
+    SENDINBLUE_FREE_SUBSCRIPTION_LIST_ID    = var.sendinblue_free_subscription_list_id
+    SENDINBLUE_PREMIUM_SUBSCRIPTION_LIST_ID = var.sendinblue_premium_subscription_list_id
   }
 
   secret_environment_variables = {
+    DATABASE_PASSWORD  = var.database_password
     SENDINBLUE_API_KEY = var.sendinblue_api_key
-    DATABASE_DATABASE  = var.database_password
   }
 
   depends_on = [google_project_service.project_services]

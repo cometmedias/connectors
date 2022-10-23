@@ -3,21 +3,33 @@ variable "project" {
   type        = string
 }
 
-variable "free_subscription_list_id" {
-  description = "(Required) The free subscription list id in sendinblue"
-  type        = string
-}
-
-variable "premium_subscription_list_id" {
-  description = "(Required) The premium subscription list id in sendinblue"
-  type        = string
-}
-
 variable "sendinblue_api_key" {
   description = "(Required) The sendinblue api key"
   type        = string
 }
 
+# Parameters environment variables
+variable "attributes_abonnements" {
+  description = "(Optional) Attributes to synchronize from abonnements table"
+  type        = string
+}
+
+variable "attributes_type_abonnement" {
+  description = "(Optional) Attributes to synchronize from type_abonnement table"
+  type        = string
+}
+
+variable "attributes_contacts" {
+  description = "(Optional) Attributes to synchronize from contacts table"
+  type        = string
+}
+
+variable "synchronisation_period" {
+  description = "(Optional) Period to synchronize"
+  type        = string
+}
+
+# Intranet environment variables
 variable "database_host" {
   description = "(Required) The intranet database host"
   type        = string
@@ -40,5 +52,16 @@ variable "database_database" {
 
 variable "database_password" {
   description = "(Required) The intranet database password"
+  type        = string
+}
+
+# Sendinblue environment variables
+variable "sendinblue_free_subscription_list_id" {
+  description = "(Required) The free subscription list id in sendinblue"
+  type        = string
+}
+
+variable "sendinblue_premium_subscription_list_id" {
+  description = "(Required) The premium subscription list id in sendinblue"
   type        = string
 }

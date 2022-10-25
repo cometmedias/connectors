@@ -30,6 +30,9 @@ module "sendinblue_update_contacts" {
     # Sendinblue
     SENDINBLUE_FREE_SUBSCRIPTION_LIST_ID    = var.sendinblue_free_subscription_list_id
     SENDINBLUE_PREMIUM_SUBSCRIPTION_LIST_ID = var.sendinblue_premium_subscription_list_id
+
+    # Better Uptime
+    BETTER_UPTIME_HEARTBEAT_URL = var.better_uptime_heartbeat_url
   }
 
   secret_environment_variables = {

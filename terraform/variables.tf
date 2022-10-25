@@ -65,3 +65,9 @@ variable "sendinblue_premium_subscription_list_id" {
   description = "(Required) The premium subscription list id in sendinblue"
   type        = string
 }
+
+# Better Uptime environment variables
+variable "better_uptime_heartbeat_url" {
+  description = "(Optional) The heartbeat url"
+  type        = string
+}

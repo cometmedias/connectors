@@ -5,7 +5,7 @@ import {
     premiumSubscriptionStatus,
     terminatedSubscriptionStatus
 } from './config/index.js';
-import {buildQueryBySubscriptionStatus, createClient, deleteContacts, formatContacts, updateContacts} from './services/index.js';
+import {buildQueryBySubscriptionStatus, createClient, deleteContacts, formatContacts, heartbeat, updateContacts} from './services/index.js';
 import {pipeAsync} from './utils/index.js';
 
 export async function sendinblueUpdateContacts(request, response) {
@@ -37,6 +37,7 @@ export async function sendinblueUpdateContacts(request, response) {
             deleteContacts
         )();
 
+        await heartbeat();
         return response.send(201);
     } catch (error) {
         console.error(error);

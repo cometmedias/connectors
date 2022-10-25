@@ -37,9 +37,9 @@ export async function sendinblueUpdateContacts(request, response) {
             deleteContacts
         )();
 
-        response.send(201);
+        return response.send(201);
     } catch (error) {
         console.error(error);
-        response.status(500).send(error);
+        return response.status(500).send(error);
     }
 }

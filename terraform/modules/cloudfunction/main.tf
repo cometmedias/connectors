@@ -24,7 +24,7 @@ resource "google_cloudfunctions2_function" "main" {
   service_config {
     max_instance_count    = 1
     available_memory      = "256M"
-    timeout_seconds       = 60
+    timeout_seconds       = 540
     service_account_email = google_service_account.main.email
 
     environment_variables = var.environment_variables

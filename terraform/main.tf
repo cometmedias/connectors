@@ -1,7 +1,3 @@
-provider "google" {
-  project = var.project
-}
-
 module "sendinblue_update_contacts" {
   source      = "./modules/cloudfunction"
   name        = "sendinblue-update-contacts"
@@ -14,31 +10,29 @@ module "sendinblue_update_contacts" {
   output_path = "../build/sendinblue-update-contacts"
   excludes    = ["node_modules"]
 
-  environment_variables = {
-    # Parameters
-    ATTRIBUTES_ABONNEMENTS     = var.attributes_abonnements
-    ATTRIBUTES_TYPE_ABONNEMENT = var.attributes_type_abonnement
-    ATTRIBUTES_CONTACTS        = var.attributes_contacts
-    SYNCHRONISATION_PERIOD     = var.synchronisation_period
+  environment_variables        = var.sendinblue_update_contacts_environment_variables
+  secret_environment_variables = var.sendinblue_update_contacts_secret_environment_variables
 
-    # Intranet
-    DATABASE_HOST     = var.database_host
-    DATABASE_PORT     = var.database_port
-    DATABASE_USER     = var.database_user
-    DATABASE_DATABASE = var.database_database
+  depends_on = [google_project_service.project_services]
+}
 
-    # Sendinblue
-    SENDINBLUE_FREE_SUBSCRIPTION_LIST_ID    = var.sendinblue_free_subscription_list_id
-    SENDINBLUE_PREMIUM_SUBSCRIPTION_LIST_ID = var.sendinblue_premium_subscription_list_id
+module "directus" {
+  source      = "./modules/cloudfunction"
+  name        = "directus-js"
+  project     = var.project
+  location    = "europe-west1"
+  description = "Directus"
+  runtime     = "nodejs16"
+  entrypoint  = "entrypoint"
+  source_dir  = "../directus"
+  output_path = "../build/directus"
+  excludes    = ["node_modules"]
 
-    # Better Uptime
-    BETTER_UPTIME_HEARTBEAT_URL = var.better_uptime_heartbeat_url
-  }
+  min_instance_count = 5
+  max_instance_count = 50
 
-  secret_environment_variables = {
-    DATABASE_PASSWORD  = var.database_password
-    SENDINBLUE_API_KEY = var.sendinblue_api_key
-  }
+  environment_variables        = var.directus_environment_variables
+  secret_environment_variables = var.directus_secret_environment_variables
 
   depends_on = [google_project_service.project_services]
 }

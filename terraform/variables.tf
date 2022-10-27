@@ -3,71 +3,34 @@ variable "project" {
   type        = string
 }
 
-variable "sendinblue_api_key" {
-  description = "(Required) The sendinblue api key"
+variable "region" {
   type        = string
+  description = "Project region"
+  default     = "europe-west1"
 }
 
-# Parameters environment variables
-variable "attributes_abonnements" {
-  description = "(Optional) Attributes to synchronize from abonnements table"
+variable "availability_zone" {
   type        = string
+  description = "Project availability zone"
+  default     = "europe-west1-b"
 }
 
-variable "attributes_type_abonnement" {
-  description = "(Optional) Attributes to synchronize from type_abonnement table"
-  type        = string
+variable "sendinblue_update_contacts_environment_variables" {
+  description = "(Optional) Environment variables for sendinblue-update-contacts module"
+  type        = map(string)
 }
 
-variable "attributes_contacts" {
-  description = "(Optional) Attributes to synchronize from contacts table"
-  type        = string
+variable "sendinblue_update_contacts_secret_environment_variables" {
+  description = "(Optional) Secret environment variables for sendinblue-update-contacts module"
+  type        = map(string)
 }
 
-variable "synchronisation_period" {
-  description = "(Optional) Period to synchronize"
-  type        = string
+variable "directus_environment_variables" {
+  description = "(Optional) Environment variables for directus module"
+  type        = map(string)
 }
 
-# Intranet environment variables
-variable "database_host" {
-  description = "(Required) The intranet database host"
-  type        = string
-}
-
-variable "database_port" {
-  description = "(Required) The intranet database port"
-  type        = string
-}
-
-variable "database_user" {
-  description = "(Required) The intranet database user"
-  type        = string
-}
-
-variable "database_database" {
-  description = "(Required) The intranet database database"
-  type        = string
-}
-
-variable "database_password" {
-  description = "(Required) The intranet database password"
-  type        = string
-}
-
-# Sendinblue environment variables
-variable "sendinblue_free_subscription_list_id" {
-  description = "(Required) The free subscription list id in sendinblue"
-  type        = string
-}
-
-variable "sendinblue_premium_subscription_list_id" {
-  description = "(Required) The premium subscription list id in sendinblue"
-  type        = string
-}
-
-# Better Uptime environment variables
-variable "better_uptime_heartbeat_url" {
-  description = "(Optional) The heartbeat url"
-  type        = string
+variable "directus_secret_environment_variables" {
+  description = "(Optional) Secret environment variables for directus module"
+  type        = map(string)
 }

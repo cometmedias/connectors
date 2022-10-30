@@ -33,13 +33,13 @@ variable "entrypoint" {
 variable "min_instance_count" {
   description = "(Optional) The limit on the minimum number of function instances that may coexist at a given time."
   type        = number
-  default     = 1
+  default     = 0
 }
 
 variable "max_instance_count" {
   description = "(Optional) The limit on the maximum number of function instances that may coexist at a given time."
   type        = number
-  default     = 1
+  default     = 3000
 }
 
 variable "source_dir" {

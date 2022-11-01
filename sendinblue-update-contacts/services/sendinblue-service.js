@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {forEachAsync} from '../utils/index.js';
-import {attributes, headers} from '../config/index.js';
+import {attributes, freeSubscriptionListId, headers, premiumSubscriptionListId} from '../config/index.js';
 
 function formatEmail(email) {
     // "fanny_michaud2000@yahoo.fr / fanny.michaud@nantesmetropole.fr"
@@ -16,7 +16,7 @@ function formatAttributes(contact) {
     };
 }
 
-export function formatContacts(listId) {
+function formatContacts(listId) {
     return (contacts) =>
         contacts.map((contact) => ({
             email: formatEmail(contact.EMAIL),
@@ -26,7 +26,10 @@ export function formatContacts(listId) {
         }));
 }
 
-export function updateContacts(listName) {
+export const formatFreeContacts = formatContacts(freeSubscriptionListId);
+export const formatPremiumContacts = formatContacts(premiumSubscriptionListId);
+
+function updateContacts(listName) {
     return async function updateContacts(contacts) {
         try {
             console.info(`Updating ${contacts.length} contacts in ${listName} list`);
@@ -39,20 +42,23 @@ export function updateContacts(listName) {
     };
 }
 
-export async function deleteContacts(contacts) {
-    try {
-        console.info(`Deleting ${contacts.length} contacts`);
-        await forEachAsync(contacts, async (contact) => {
-            try {
-                await axios.delete(`https://api.sendinblue.com/v3/contacts/${contact.email}`, headers);
-            } catch (error) {
-                // Ignore users not found
-                if (error.response.status !== 404) throw error;
-            }
-        });
-        console.info(`${contacts.length} contacts deleted successfully`);
-    } catch (error) {
-        console.error(error);
-        throw new Error('An error occurred while deleting contacts in sendinblue', error);
-    }
-}
+export const updateFreeContacts = updateContacts('free');
+export const updatePremiumContacts = updateContacts('premium');
+
+// export async function deleteContacts(contacts) {
+//     try {
+//         console.info(`Deleting ${contacts.length} contacts`);
+//         await forEachAsync(contacts, async (contact) => {
+//             try {
+//                 await axios.delete(`https://api.sendinblue.com/v3/contacts/${contact.email}`, headers);
+//             } catch (error) {
+//                 // Ignore users not found
+//                 if (error.response.status !== 404) throw error;
+//             }
+//         });
+//         console.info(`${contacts.length} contacts deleted successfully`);
+//     } catch (error) {
+//         console.error(error);
+//         throw new Error('An error occurred while deleting contacts in sendinblue', error);
+//     }
+// }

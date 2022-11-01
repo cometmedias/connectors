@@ -9,22 +9,35 @@ export async function createClient() {
     return client;
 }
 
-// Build a query
-export function buildQueryBySubscriptionStatus(subscriptionStatus) {
+function buildBaseQuery(select = '', join = '', isPremium = false) {
+    // WHERE ta.NOM_ABONNEMENT IN (${subscriptionStatus.map((name) => `"${name}"`).join(', ')})
+    return `
+        SELECT DISTINCT c.EMAIL, ${select}
+        FROM intranet.contacts c
+        ${join}
+        WHERE c.EMAIL NOT IN (SELECT b.EMAIL FROM intranet.bounced b)
+        AND c.ID_ENTREPRISE ${isPremium ? '' : 'NOT '} IN (SELECT a.ID_SOCIETE FROM intranet.abonnements a)
+        AND c.OPTIN = 'oui';
+        ${Number.isNaN(synchronizationPeriod) ? '' : `AND DATE (a.DATE_MAJ) > CURRENT_DATE() - ${synchronizationPeriod}`}
+    `;
+}
+
+// Build a query for 'Liste Non Abonnés'
+export function buildFreeQuery() {
+    return buildBaseQuery(attributesContacts.map((attribute) => `c.${attribute}`));
+}
+
+// Build a query for 'Liste Abonnés'
+export function buildPremiumQuery() {
     const select = [
         ...attributesAbonnements.map((attribute) => `a.${attribute}`),
         ...attributesTypeAbonnement.map((attribute) => `ta.${attribute}`),
         ...attributesContacts.map((attribute) => `c.${attribute}`)
     ].join(', ');
 
-    return () => `
-        SELECT ${select}
-        FROM abonnements a
-        JOIN contacts c ON a.ID_SOCIETE = c.ID_ENTREPRISE
-        JOIN type_abonnement ta ON a.STATUT_DESTINATAIRE = ta.ID_TYPE_ABONNEMENT
-        WHERE ta.NOM_ABONNEMENT IN (${subscriptionStatus.map((name) => `"${name}"`).join(', ')})
-        ${Number.isNaN(synchronizationPeriod) ? '' : `AND DATE (a.DATE_MAJ) > CURRENT_DATE() - ${synchronizationPeriod}`}
-        GROUP BY c.email
-        ORDER BY DATE (a.DATE_MAJ) DESC;
-    `;
+    const join = `
+        JOIN intranet.abonnements a ON a.ID_SOCIETE = c.ID_ENTREPRISE
+        JOIN intranet.type_abonnement ta ON ta.ID_TYPE_ABONNEMENT = a.STATUT_DESTINATAIRE`;
+
+    return buildBaseQuery(select, join, true);
 }

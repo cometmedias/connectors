@@ -1,41 +1,30 @@
 import {
-    freeSubscriptionListId,
-    freeSubscriptionStatus,
-    premiumSubscriptionListId,
-    premiumSubscriptionStatus,
-    terminatedSubscriptionStatus
-} from './config/index.js';
-import {buildQueryBySubscriptionStatus, createClient, deleteContacts, formatContacts, heartbeat, updateContacts} from './services/index.js';
+    buildFreeQuery,
+    buildPremiumQuery,
+    createClient,
+    formatFreeContacts,
+    formatPremiumContacts,
+    heartbeat,
+    updateFreeContacts,
+    updatePremiumContacts
+} from './services/index.js';
 import {pipeAsync} from './utils/index.js';
 
 export async function sendinblueUpdateContacts(request, response) {
     try {
         const client = await createClient();
 
-        // Update free subscription list
-        await pipeAsync(
-            buildQueryBySubscriptionStatus(freeSubscriptionStatus),
-            client.query.bind(client),
-            formatContacts(freeSubscriptionListId),
-            updateContacts('free')
-        )();
-
-        // Update premium subscription list
-        await pipeAsync(
-            buildQueryBySubscriptionStatus(premiumSubscriptionStatus),
-            client.query.bind(client),
-            formatContacts(premiumSubscriptionListId),
-            updateContacts('premium')
-        )();
+        await pipeAsync(buildFreeQuery, client.query.bind(client), formatFreeContacts, updateFreeContacts)();
+        await pipeAsync(buildPremiumQuery, client.query.bind(client), formatPremiumContacts, updatePremiumContacts)();
 
         // Removing terminated subscriptions
-        await pipeAsync(
-            //
-            buildQueryBySubscriptionStatus(terminatedSubscriptionStatus),
-            client.query.bind(client),
-            formatContacts(),
-            deleteContacts
-        )();
+        // await pipeAsync(
+        //     //
+        //     buildQueryBySubscriptionStatus(terminatedSubscriptionStatus),
+        //     client.query.bind(client),
+        //     formatContacts(),
+        //     deleteContacts
+        // )();
 
         await heartbeat();
         return response.send(201);

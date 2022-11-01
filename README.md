@@ -6,10 +6,10 @@ Custom connectors for cometmedias
 
 ```shell
 tf workspace select dev
-tf apply -var-file=tfvars/dev.tfvars
+tf apply -var-file=tfvars/dev.tfvars --auto-approve
 
 tf workspace select prod
-tf apply -var-file=tfvars/prod.tfvars
+tf apply -var-file=tfvars/prod.tfvars --auto-approve
 ```
 
 # Trigger function

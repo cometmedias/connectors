@@ -1,8 +1,3 @@
-resource "google_service_account" "main" {
-  account_id   = "sa-${var.name}"
-  display_name = "Service Account for ${var.name}"
-}
-
 resource "google_cloudfunctions2_function" "main" {
   name        = var.name
   location    = var.location

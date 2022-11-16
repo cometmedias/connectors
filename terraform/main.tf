@@ -8,7 +8,7 @@ module "sendinblue_update_contacts" {
   entrypoint  = "sendinblueUpdateContacts"
   source_dir  = "../sendinblue-update-contacts"
   output_path = "../build/sendinblue-update-contacts"
-  excludes    = ["node_modules"]
+  excludes    = ["node_modules", ".env"]
 
   environment_variables        = var.sendinblue_update_contacts_environment_variables
   secret_environment_variables = var.sendinblue_update_contacts_secret_environment_variables
@@ -26,7 +26,7 @@ module "directus" {
   entrypoint  = "entrypoint"
   source_dir  = "../directus"
   output_path = "../build/directus"
-  excludes    = ["node_modules"]
+  excludes    = ["node_modules", ".env"]
 
   environment_variables        = var.directus_environment_variables
   secret_environment_variables = var.directus_secret_environment_variables

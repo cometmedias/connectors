@@ -55,6 +55,7 @@ variable "output_path" {
 variable "excludes" {
   description = "(Optional) Specify files to ignore when reading the source_dir."
   type        = list(string)
+  default     = []
 }
 
 variable "environment_variables" {

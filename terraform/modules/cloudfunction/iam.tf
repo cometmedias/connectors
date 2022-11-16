@@ -1,3 +1,8 @@
+resource "google_service_account" "main" {
+  account_id   = "sa-${var.name}"
+  display_name = "Service Account for ${var.name}"
+}
+
 resource "google_cloud_run_service_iam_member" "main" {
   count = var.allow_unauthenticated ? 1 : 0
 
